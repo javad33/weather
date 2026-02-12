@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اپ هواشناسی من</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="card">
+        <h2>وضعیت آب و هوا</h2>
+        <input type="text" id="cityInput" placeholder="نام شهر را انگلیسی بنویسید (مثلاً Tehran)">
+        <button onclick="getWeather()">بپرس</button>
+        
+        <div id="result" class="result">
+            <h1 id="temp">--°C</h1>
+            <p id="desc">منتظر ورود نام شهر...</p>
+        </div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            const city = document.getElementById('cityInput').value;
+            const res = await fetch(`https://wttr.in/${city}?format=j1`);
+            const data = await res.json();
+            
+            document.getElementById('temp').innerText = data.current_condition[0].temp_C + "°C";
+            document.getElementById('desc').innerText = "رطوبت: " + data.current_condition[0].humidity + "%";
+        }
+
+        // ثبت سرویس ورکر برای تبدیل به PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
