@@ -3,44 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>هواشناسی حرفه‌ای</title>
+    <title>هواشناسی هوشمند</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <div class="container">
-        <div class="search-box">
-            <i class="fa-solid fa-location-dot"></i>
-            <input type="text" id="cityInput" placeholder="نام شهر (انگلیسی)...">
-            <button onclick="getWeather()"><i class="fa-solid fa-magnifying-glass"></i></button>
+    <div class="app-container">
+        <div class="header">
+            <h2 id="shamsiDate">--/--/----</h2>
+            <p id="cityNameDisplay">شهر خود را انتخاب کنید</p>
         </div>
 
-        <div id="weatherContent" class="weather-card animate__animated">
-            <img src="https://cdn-icons-png.flaticon.com/512/4814/4814268.png" id="weatherIcon" class="main-icon">
-            <h1 id="temp">--°C</h1>
-            <p id="cityName">لطفاً شهر را جستجو کنید</p>
-            
-            <div class="details">
-                <div class="col">
-                    <i class="fa-solid fa-droplet"></i>
-                    <div>
-                        <p class="label">رطوبت</p>
-                        <p id="humidity">--%</p>
-                    </div>
-                </div>
-                <div class="col">
-                    <i class="fa-solid fa-wind"></i>
-                    <div>
-                        <p class="label">سرعت باد</p>
-                        <p id="windSpeed">-- km/h</p>
-                    </div>
-                </div>
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="cityInput" placeholder="نام شهر (فارسی یا انگلیسی)..." oninput="searchCity()">
+                <div id="suggestions" class="suggestions-list"></div>
             </div>
+        </div>
+
+        <div id="loader" class="loader" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <div class="current-weather">
+                <h1 id="mainTemp">--°C</h1>
+                <p id="weatherDesc">وضعیت هوا</p>
+                <div class="aqi-badge" id="aqiBadge">شاخص آلودگی: --</div>
+            </div>
+
+            <h3>پیش‌بینی ۲۴ ساعت آینده</h3>
+            <div class="hourly-forecast" id="hourlyList"></div>
+
+            <h3>۷ روز آینده</h3>
+            <div class="daily-forecast" id="dailyList"></div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/jalali-moment/dist/jalali-moment.browser.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
