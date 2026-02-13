@@ -3,42 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>هواشناسی هوشمند</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>هواشناسی حرفه‌ای</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <div class="app-container">
-        <div class="header">
-            <h2 id="shamsiDate">--/--/----</h2>
-            <p id="cityNameDisplay">شهر خود را انتخاب کنید</p>
-        </div>
-
-        <div class="search-section">
-            <div class="search-box">
-                <input type="text" id="cityInput" placeholder="نام شهر (فارسی یا انگلیسی)..." oninput="searchCity()">
-                <div id="suggestions" class="suggestions-list"></div>
+    <div class="background-overlay"></div>
+    <div class="app-wrapper">
+        <header>
+            <div class="top-bar">
+                <span id="shamsiDate">--/--/----</span>
+                <i class="fa-solid fa-calendar-day"></i>
             </div>
-        </div>
-
-        <div id="loader" class="loader" style="display: none;">
-            <div class="spinner"></div>
-        </div>
-
-        <div id="mainContent" style="display: none;">
-            <div class="current-weather">
-                <h1 id="mainTemp">--°C</h1>
-                <p id="weatherDesc">وضعیت هوا</p>
-                <div class="aqi-badge" id="aqiBadge">شاخص آلودگی: --</div>
+            <div class="search-container">
+                <div class="search-inner">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="cityInput" placeholder="جستجوی شهر..." autocomplete="off" oninput="searchCity()">
+                </div>
+                <div id="suggestions" class="suggestions-box"></div>
             </div>
+        </header>
 
-            <h3>پیش‌بینی ۲۴ ساعت آینده</h3>
-            <div class="hourly-forecast" id="hourlyList"></div>
-
-            <h3>۷ روز آینده</h3>
-            <div class="daily-forecast" id="dailyList"></div>
+        <div id="loader" class="loader-overlay" style="display: none;">
+            <div class="custom-loader"></div>
         </div>
+
+        <main id="mainContent" class="hidden">
+            <section class="hero-section">
+                <h2 id="cityNameDisplay">تهران</h2>
+                <div class="main-temp-container">
+                    <span id="mainTemp">۲۴</span><span class="unit">°</span>
+                </div>
+                <p id="weatherDesc">آسمان صاف</p>
+                <div id="aqiContainer" class="aqi-container">
+                    <span id="aqiBadge">شاخص آلودگی: ۴۵</span>
+                </div>
+            </section>
+
+            <section class="forecast-section">
+                <div class="section-title">پیش‌بینی ۲۴ ساعته</div>
+                <div class="hourly-wrapper" id="hourlyList"></div>
+            </section>
+
+            <section class="forecast-section">
+                <div class="section-title">۷ روز آینده</div>
+                <div class="daily-wrapper" id="dailyList"></div>
+            </section>
+        </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jalali-moment/dist/jalali-moment.browser.js"></script>
