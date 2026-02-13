@@ -1,84 +1,99 @@
-let myChart;
+let tempChart;
+const weatherCodes = {
+    0: "صاف", 1: "عمدتاً صاف", 2: "نیمه ابری", 3: "ابری",
+    45: "مه‌آلود", 48: "مه شدید", 51: "باران ریز", 61: "باران",
+    63: "باران شدید", 71: "برف خفیف", 73: "برف", 95: "رعد و برق"
+};
 
-// آپدیت زمان و تاریخ
-function updateDateTime() {
-    const now = moment();
-    document.getElementById('shamsiDate').innerText = now.locale('fa').format('jD jMMMM jYYYY');
-    document.getElementById('currentTime').innerText = now.format('HH:mm');
-}
-setInterval(updateDateTime, 1000);
-
-async function searchCity() {
-    const q = document.getElementById('cityInput').value;
-    if(q.length < 3) return;
-    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${q}&count=5`);
-    const data = await res.json();
-    const sug = document.getElementById('suggestions');
-    sug.innerHTML = data.results ? data.results.map(c => 
-        `<div onclick="selectCity(${c.latitude}, ${c.longitude}, '${c.name}')">${c.name}, ${c.country}</div>`).join('') : '';
-}
+// برای تست، یک شهر پیش‌فرض را لود می‌کنیم
+document.addEventListener('DOMContentLoaded', () => {
+    selectCity(35.6892, 51.3890, 'تهران');
+});
 
 async function selectCity(lat, lon, name) {
-    document.getElementById('suggestions').innerHTML = '';
     document.getElementById('loader').style.display = 'flex';
-    document.getElementById('weatherContent').style.display = 'none';
-
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m,pressure_msl,surface_pressure,uv_index,visibility&hourly=temperature_2m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
-    const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`;
-
     try {
-        const [wRes, aRes] = await Promise.all([fetch(url), fetch(airUrl)]);
+        const [wRes, aRes] = await Promise.all([
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,visibility&hourly=temperature_2m,weather_code&timezone=auto`),
+            fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`)
+        ]);
         const wData = await wRes.json();
         const aData = await aRes.json();
         
-        displayWeather(wData, aData, name);
-        drawChart(wData.hourly.temperature_2m.slice(0, 24));
-    } finally {
-        document.getElementById('loader').style.display = 'none';
-        document.getElementById('weatherContent').style.display = 'block';
-    }
+        renderApp(wData, aData, name);
+    } catch (e) { alert("خطا در دریافت اطلاعات"); }
+    finally { document.getElementById('loader').style.display = 'none'; }
 }
 
-function displayWeather(w, a, name) {
-    document.getElementById('cityName').innerText = name;
-    document.getElementById('temp').innerText = Math.round(w.current.temperature_2m);
+function renderApp(w, a, name) {
+    // کارت اصلی
+    document.getElementById('cityNameDisplay').innerText = name;
+    document.getElementById('mainTemp').innerText = Math.round(w.current.temperature_2m) + "°";
+    document.getElementById('weatherDesc').innerText = weatherCodes[w.current.weather_code] || "نامشخص";
+    document.getElementById('windSpeed').innerText = w.current.wind_speed_10m + " km/h";
     document.getElementById('humidity').innerText = w.current.relative_humidity_2m + "%";
-    document.getElementById('wind').innerText = w.current.wind_speed_10m + " km/h";
-    document.getElementById('pressure').innerText = Math.round(w.current.surface_pressure) + " hPa";
-    document.getElementById('uv').innerText = w.current.uv_index;
     document.getElementById('visibility').innerText = (w.current.visibility / 1000).toFixed(1) + " km";
-    document.getElementById('aqi').innerText = a.current.us_aqi;
-    
-    // تغییر رنگ پس‌زمینه بر اساس روز یا شب
-    document.getElementById('dynamicBg').style.background = w.current.is_day ? 
-        'linear-gradient(180deg, #4facfe 0%, #00f2fe 100%)' : 'linear-gradient(180deg, #09203f 0%, #537895 100%)';
+    document.getElementById('mainWeatherIcon').src = getWeatherIcon(w.current.weather_code);
 
-    // لیست هفتگی
-    const list = document.getElementById('weeklyList');
-    list.innerHTML = w.daily.time.map((t, i) => `
-        <div class="weekly-item">
-            <span>${moment(t).locale('fa').format('dddd')}</span>
-            <span>${Math.round(w.daily.temperature_2m_max[i])}° / ${Math.round(w.daily.temperature_2m_min[i])}°</span>
-        </div>
-    `).join('');
+    // پیش‌بینی ساعتی
+    const hList = document.getElementById('hourlyList');
+    hList.innerHTML = '';
+    for (let i = 0; i < 24; i++) {
+        hList.innerHTML += `
+            <div class="hourly-item">
+                <span class="hourly-time">${i}:00</span>
+                <img src="${getWeatherIcon(w.hourly.weather_code[i])}" class="hourly-icon">
+                <span class="hourly-temp">${Math.round(w.hourly.temperature_2m[i])}°</span>
+            </div>`;
+    }
+
+    // کیفیت هوا
+    const aqi = a.current.us_aqi;
+    const aqiInd = document.getElementById('aqiIndicator');
+    document.getElementById('aqiValue').innerText = aqi;
+    let status = "خوب", color = "#4caf50", desc = "کیفیت هوا رضایت‌بخش است.";
+    if (aqi > 50) { status = "متوسط"; color = "#ff9800"; desc = "ممکن است برای گروه‌های حساس مضر باشد."; }
+    if (aqi > 100) { status = "ناسالم"; color = "#f44336"; desc = "برای همه گروه‌ها ناسالم است."; }
+    aqiInd.style.background = color;
+    document.getElementById('aqiStatus').innerText = status;
+    document.getElementById('aqiDescription').innerText = desc;
+
+    // نمودار
+    drawChart(w.hourly.temperature_2m.slice(0, 24));
+}
+
+function getWeatherIcon(code) {
+    // برای سادگی، از آیکون‌های ثابت استفاده می‌کنیم. در پروژه واقعی می‌توان از منابع معتبرتر استفاده کرد.
+    if (code === 0) return "https://cdn-icons-png.flaticon.com/512/869/869869.png";
+    if (code >= 1 && code <= 3) return "https://cdn-icons-png.flaticon.com/512/1163/1163624.png";
+    if (code >= 45) return "https://cdn-icons-png.flaticon.com/512/4151/4151022.png";
+    if (code >= 51) return "https://cdn-icons-png.flaticon.com/512/3351/3351979.png";
+    return "https://cdn-icons-png.flaticon.com/512/869/869869.png";
 }
 
 function drawChart(temps) {
     const ctx = document.getElementById('tempChart').getContext('2d');
-    if(myChart) myChart.destroy();
-    myChart = new Chart(ctx, {
+    if(tempChart) tempChart.destroy();
+    tempChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: Array.from({length: 24}, (_, i) => i + ":00"),
             datasets: [{
-                label: 'دما',
                 data: temps,
-                borderColor: '#ffce45',
-                backgroundColor: 'rgba(255, 206, 69, 0.2)',
+                borderColor: '#4facfe',
+                backgroundColor: 'rgba(79, 172, 254, 0.2)',
                 fill: true,
-                tension: 0.4
+                tension: 0.4,
+                pointRadius: 0
             }]
         },
-        options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#fff' } } } }
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { display: false },
+                x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.5)', maxTicksLimit: 6 } }
+            }
+        }
     });
 }
