@@ -3,82 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>هواشناسی مدرن</title>
+    <title>هواشناسی پرو</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <div class="app-container">
-        <header class="app-header">
-            <button class="icon-btn"><i class="fa-solid fa-bars"></i></button>
-            <h2 id="cityNameDisplay">تهران</h2>
-            <button class="icon-btn"><i class="fa-regular fa-user"></i></button>
-        </header>
 
-        <section class="main-weather-card animate-fade-in">
-            <div class="weather-info">
-                <h1 id="mainTemp">--°</h1>
-                <p id="weatherDesc">وضعیت جوی</p>
-            </div>
-            <img id="mainWeatherIcon" src="" alt="Weather Icon" class="main-icon">
-            
-            <div class="weather-details-row">
-                <div class="detail-item">
-                    <i class="fa-solid fa-wind"></i>
-                    <span id="windSpeed">-- km/h</span>
-                    <small>سرعت باد</small>
-                </div>
-                <div class="detail-item">
-                    <i class="fa-solid fa-droplet"></i>
-                    <span id="humidity">--%</span>
-                    <small>رطوبت</small>
-                </div>
-                <div class="detail-item">
-                    <i class="fa-solid fa-eye"></i>
-                    <span id="visibility">-- km</span>
-                    <small>دید افقی</small>
-                </div>
-            </div>
-        </section>
+        <div id="mainView" class="view-section">
+            <header class="app-header">
+                <button class="icon-btn" onclick="switchView('searchView')"><i class="fa-solid fa-bars"></i></button>
+                <h2 id="cityNameDisplay">--</h2>
+                <button class="icon-btn" onclick="selectCity(35.6892, 51.3890, 'تهران')"><i class="fa-solid fa-location-crosshairs"></i></button>
+            </header>
 
-        <section class="hourly-forecast-section animate-fade-in">
-            <div class="section-header">
-                <h3>امروز</h3>
-                <button class="link-btn">۷ روز آینده <i class="fa-solid fa-chevron-left"></i></button>
-            </div>
-            <div class="hourly-scroll-container" id="hourlyList">
+            <section class="main-weather-card">
+                <div class="weather-info">
+                    <h1 id="mainTemp">--°</h1>
+                    <p id="weatherDesc">--</p>
                 </div>
-        </section>
+                <div id="mainIconContainer" class="main-icon-wrapper">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                </div>
+                
+                <div class="weather-details-row">
+                    <div class="detail-item">
+                        <i class="fa-solid fa-wind"></i>
+                        <span id="windSpeed">--</span>
+                        <small>سرعت باد</small>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fa-solid fa-droplet"></i>
+                        <span id="humidity">--</span>
+                        <small>رطوبت</small>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fa-solid fa-eye"></i>
+                        <span id="visibility">--</span>
+                        <small>دید افقی</small>
+                    </div>
+                </div>
+            </section>
 
-        <section class="air-quality-card animate-fade-in">
-            <div class="section-header">
-                <h3>کیفیت هوا</h3>
-                <button class="link-btn">مشاهده گزارش <i class="fa-solid fa-chevron-left"></i></button>
-            </div>
-            <div class="aqi-content">
-                <div class="aqi-indicator" id="aqiIndicator">
-                    <span id="aqiValue">--</span>
+            <section class="forecast-section">
+                <div class="section-header">
+                    <h3>امروز</h3>
+                    <button class="link-btn" onclick="switchView('forecastView')">۷ روز آینده <i class="fa-solid fa-chevron-left"></i></button>
                 </div>
-                <div class="aqi-details">
-                    <h4 id="aqiStatus">--</h4>
-                    <p id="aqiDescription">در حال دریافت اطلاعات...</p>
-                </div>
-            </div>
-        </section>
+                <div class="hourly-scroll-container" id="hourlyList"></div>
+            </section>
 
-        <section class="chart-section animate-fade-in">
-            <div class="section-header">
-                <h3>نمودار دما</h3>
+            <section class="air-quality-card">
+                <div class="section-header">
+                    <h3>کیفیت هوا</h3>
+                </div>
+                <div class="aqi-content">
+                    <div class="aqi-indicator" id="aqiIndicator"><span id="aqiValue">-</span></div>
+                    <div class="aqi-details">
+                        <h4 id="aqiStatus">--</h4>
+                        <p id="aqiDescription">--</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="chart-section">
+                <div class="section-header"><h3>نمودار دما (۲۴ ساعت)</h3></div>
+                <div class="chart-container"><canvas id="tempChart"></canvas></div>
+            </section>
+        </div>
+
+        <div id="searchView" class="view-section hidden-view">
+            <header class="app-header">
+                <button class="icon-btn" onclick="switchView('mainView')"><i class="fa-solid fa-arrow-right"></i></button>
+                <h2>جستجوی شهر</h2>
+                <div style="width: 45px;"></div>
+            </header>
+            <div class="search-box">
+                <input type="text" id="citySearchInput" placeholder="نام شهر را تایپ کنید..." oninput="handleSearch()">
             </div>
-            <div class="chart-container">
-                <canvas id="tempChart"></canvas>
-            </div>
-        </section>
+            <div id="searchResults" class="search-results"></div>
+        </div>
+
+        <div id="forecastView" class="view-section hidden-view">
+            <header class="app-header">
+                <button class="icon-btn" onclick="switchView('mainView')"><i class="fa-solid fa-arrow-right"></i></button>
+                <h2>پیش‌بینی هفته</h2>
+                <div style="width: 45px;"></div>
+            </header>
+            <div id="weeklyForecastList" class="weekly-list"></div>
+        </div>
+
     </div>
 
-    <div id="loader" class="loader-overlay" style="display: none;">
-        <div class="spinner"></div>
-    </div>
+    <div id="globalLoader" class="loader-overlay"><div class="spinner"></div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jalali-moment/dist/jalali-moment.browser.js"></script>
