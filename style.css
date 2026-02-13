@@ -1,33 +1,88 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 body {
-    background: #f0f2f5;
-    font-family: Tahoma, sans-serif;
+    background: linear-gradient(135deg, #00feba, #5b548a);
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
 }
-.card {
-    background: white;
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    text-align: center;
-    width: 300px;
-}
-input {
+
+.container {
     width: 90%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-}
-button {
-    background: #007bff;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    padding: 30px;
+    text-align: center;
     color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 10px;
-    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
-.result { margin-top: 20px; }
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 10px 20px;
+    margin-bottom: 30px;
+}
+
+.search-box input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    font-size: 18px;
+}
+
+.search-box button {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.main-icon {
+    width: 150px;
+    margin-top: 10px;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+}
+
+#temp {
+    font-size: 70px;
+    font-weight: 700;
+}
+
+#cityName {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+.details {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+
+.col {
+    display: flex;
+    align-items: center;
+    text-align: right;
+}
+
+.col i {
+    font-size: 25px;
+    margin-left: 10px;
+}
+
+.label { font-size: 14px; }
