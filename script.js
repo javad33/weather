@@ -1,85 +1,82 @@
-// نمایش تاریخ شمسی در لحظه ورود
-document.getElementById('shamsiDate').innerText = moment().locale('fa').format('YYYY/MM/DD');
+const weatherCodes = {
+    0: "آسمان صاف", 1: "عمدتاً صاف", 2: "نیمه ابری", 3: "ابری",
+    45: "مه‌آلود", 48: "مه شدید", 51: "باران ریز", 61: "باران ملایم",
+    71: "برش خفیف برف", 95: "رعد و برق"
+};
 
-// ۱. سیستم ساجسشن و جستجوی شهر (Geocoding)
+document.getElementById('shamsiDate').innerText = moment().locale('fa').format('jD jMMMM jYYYY');
+
 async function searchCity() {
     const query = document.getElementById('cityInput').value;
-    if (query.length < 3) return;
-
-    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=5&language=en`);
-    const data = await res.json();
-    
-    const list = document.getElementById('suggestions');
-    list.innerHTML = '';
-    
-    if (data.results) {
-        data.results.forEach(city => {
-            const div = document.createElement('div');
-            div.className = 'suggestion-item';
-            div.innerText = `${city.name}, ${city.country}`;
-            div.onclick = () => selectCity(city.latitude, city.longitude, city.name);
-            list.appendChild(div);
-        });
-    }
-}
-
-// ۲. انتخاب شهر و دریافت دیتای اصلی
-async function selectCity(lat, lon, name) {
-    document.getElementById('suggestions').innerHTML = '';
-    document.getElementById('cityInput').value = name;
-    document.getElementById('loader').style.display = 'block';
-    document.getElementById('mainContent').style.display = 'none';
+    const box = document.getElementById('suggestions');
+    if (query.length < 3) { box.innerHTML = ''; return; }
 
     try {
-        // دریافت همزمان هواشناسی و آلودگی هوا
-        const [weatherRes, airRes] = await Promise.all([
+        const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=5`);
+        const data = await res.json();
+        box.innerHTML = '';
+        if (data.results) {
+            data.results.forEach(city => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${city.name}, ${city.country}`;
+                item.onclick = () => selectCity(city.latitude, city.longitude, city.name);
+                box.appendChild(item);
+            });
+        }
+    } catch (e) { console.error(e); }
+}
+
+async function selectCity(lat, lon, name) {
+    document.getElementById('suggestions').innerHTML = '';
+    document.getElementById('loader').style.display = 'flex';
+    document.getElementById('mainContent').classList.add('hidden');
+
+    try {
+        const [wRes, aRes] = await Promise.all([
             fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`),
             fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`)
         ]);
 
-        const weatherData = await weatherRes.json();
-        const airData = await airRes.json();
-
-        renderWeather(weatherData, airData, name);
-    } catch (error) {
-        alert("خطا در دریافت اطلاعات!");
-    } finally {
+        const weather = await wRes.json();
+        const air = await aRes.json();
+        renderApp(weather, air, name);
+    } catch (e) { alert("خطا در برقراری ارتباط"); }
+    finally {
         document.getElementById('loader').style.display = 'none';
-        document.getElementById('mainContent').style.display = 'block';
+        document.getElementById('mainContent').classList.remove('hidden');
     }
 }
 
-// ۳. نمایش دیتا در اپلیکیشن
-function renderWeather(data, air, name) {
-    document.getElementById('cityNameDisplay').innerText = name;
-    document.getElementById('mainTemp').innerText = Math.round(data.current_weather.temperature) + "°C";
-    
-    // شاخص آلودگی
+function renderApp(data, air, cityName) {
+    document.getElementById('cityNameDisplay').innerText = cityName;
+    document.getElementById('mainTemp').innerText = Math.round(data.current_weather.temperature);
+    document.getElementById('weatherDesc').innerText = weatherCodes[data.current_weather.weathercode] || "وضعیت فعلی";
+
     const aqi = air.current.us_aqi;
-    const aqiBadge = document.getElementById('aqiBadge');
-    aqiBadge.innerText = `شاخص آلودگی: ${aqi}`;
-    aqiBadge.style.background = aqi > 100 ? '#f44336' : (aqi > 50 ? '#ff9800' : '#4caf50');
+    const badge = document.getElementById('aqiBadge');
+    badge.innerText = `شاخص آلودگی: ${aqi}`;
+    badge.parentElement.style.background = aqi > 100 ? 'rgba(255,0,0,0.3)' : 'rgba(0,255,0,0.2)';
 
     // پیش‌بینی ساعتی
-    const hourlyList = document.getElementById('hourlyList');
-    hourlyList.innerHTML = '';
+    const hList = document.getElementById('hourlyList');
+    hList.innerHTML = '';
     for (let i = 0; i < 24; i++) {
-        hourlyList.innerHTML += `
+        hList.innerHTML += `
             <div class="hourly-item">
-                <small>${i}:00</small>
-                <div>${Math.round(data.hourly.temperature_2m[i])}°</div>
+                <div style="font-size: 0.8rem; opacity: 0.7">${i}:00</div>
+                <div style="font-size: 1.2rem; margin: 5px 0">${Math.round(data.hourly.temperature_2m[i])}°</div>
             </div>`;
     }
 
-    // پیش‌بینی ۷ روزه
-    const dailyList = document.getElementById('dailyList');
-    dailyList.innerHTML = '';
-    data.daily.time.forEach((date, index) => {
-        const shamsiDay = moment(date).locale('fa').format('dddd');
-        dailyList.innerHTML += `
+    // پیش‌بینی روزانه
+    const dList = document.getElementById('dailyList');
+    dList.innerHTML = '';
+    data.daily.time.forEach((t, i) => {
+        dList.innerHTML += `
             <div class="daily-item">
-                <span>${shamsiDay}</span>
-                <span>${Math.round(data.daily.temperature_2m_max[index])}° / ${Math.round(data.daily.temperature_2m_min[index])}°</span>
+                <span>${moment(t).locale('fa').format('dddd')}</span>
+                <span style="font-weight: bold">${Math.round(data.daily.temperature_2m_max[i])}° / ${Math.round(data.daily.temperature_2m_min[i])}°</span>
             </div>`;
     });
 }
