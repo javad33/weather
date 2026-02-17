@@ -8,11 +8,30 @@
     --warning-color: #ff9800;
     --danger-color: #f44336;
     --info-color: #2196f3;
+    --tertiary-color: #8e44ad;
+    --sunrise-color: #ff9a00;
+    --sunset-color: #8e44ad;
+    --rain-color: #3498db;
+    --snow-color: #ecf0f1;
+    --wind-color: #9b59b6;
+    --pressure-color: #e67e22;
+    --cloud-color: #bdc3c7;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', Tahoma, sans-serif; }
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Vazirmatn', Tahoma, sans-serif; 
+}
 
-body { background: var(--bg-dark); color: var(--text-color); overflow-x: hidden; }
+body { 
+    background: var(--bg-dark); 
+    color: var(--text-color); 
+    overflow-x: hidden; 
+    background-image: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 20%),
+                      radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 20%);
+}
 
 .app-container { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
 
@@ -30,13 +49,26 @@ body { background: var(--bg-dark); color: var(--text-color); overflow-x: hidden;
     background: linear-gradient(145deg, #4facfe 0%, #00f2fe 100%);
     border-radius: 35px; padding: 30px 20px; text-align: center; margin-bottom: 30px;
     box-shadow: 0 15px 30px rgba(0, 242, 254, 0.2);
+    position: relative;
+    overflow: hidden;
 }
+.main-weather-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    z-index: 0;
+}
+.weather-info { position: relative; z-index: 1; }
 .weather-info h1 { font-size: 5.5rem; font-weight: 800; line-height: 1; margin: 10px 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.1); }
 .weather-info p { font-size: 1.2rem; font-weight: 500; opacity: 0.9; }
 
-.main-icon-wrapper { font-size: 7rem; margin: 15px 0; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); color: white; }
+.main-icon-wrapper { font-size: 7rem; margin: 15px 0; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); color: white; position: relative; z-index: 1; }
 
-.weather-details-row { display: flex; justify-content: space-between; background: rgba(0,0,0,0.15); border-radius: 20px; padding: 15px; margin-top: 20px; backdrop-filter: blur(10px); }
+.weather-details-row { display: flex; justify-content: space-between; background: rgba(0,0,0,0.15); border-radius: 20px; padding: 15px; margin-top: 20px; backdrop-filter: blur(10px); position: relative; z-index: 1; }
 .detail-item { display: flex; flex-direction: column; align-items: center; width: 33%; }
 .detail-item i { font-size: 1.3rem; margin-bottom: 5px; opacity: 0.8; }
 .detail-item span { font-weight: bold; font-size: 1rem; }
@@ -58,16 +90,38 @@ body { background: var(--bg-dark); color: var(--text-color); overflow-x: hidden;
     flex-direction: column; 
     align-items: center; 
     gap: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+.detail-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: left;
     transition: transform 0.3s ease;
 }
 .detail-card:hover {
     transform: translateY(-5px);
     background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+.detail-card:hover::before {
+    transform: scaleX(1);
 }
 .detail-card i { 
     font-size: 1.8rem; 
     margin-bottom: 5px; 
     color: var(--accent-color);
+    transition: transform 0.3s ease;
+}
+.detail-card:hover i {
+    transform: scale(1.1);
 }
 .detail-card h4 { 
     font-size: 0.85rem; 
@@ -87,17 +141,112 @@ body { background: var(--bg-dark); color: var(--text-color); overflow-x: hidden;
 .link-btn { background: none; border: none; color: var(--accent-color); font-size: 0.9rem; cursor: pointer; font-family: inherit; }
 
 /* اسکرول ساعتی */
-.hourly-scroll-container { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 15px; scrollbar-width: none; }
-.hourly-item { background: var(--card-bg); border-radius: 20px; padding: 15px 10px; min-width: 75px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-.hourly-time { font-size: 0.85rem; color: var(--secondary-text); display: block; margin-bottom: 10px; }
-.hourly-icon { font-size: 1.5rem; margin-bottom: 10px; color: var(--accent-color); }
-.hourly-temp { font-weight: bold; font-size: 1.1rem; }
+.hourly-scroll-container { 
+    display: flex; 
+    overflow-x: auto; 
+    gap: 12px; 
+    padding-bottom: 15px; 
+    scrollbar-width: thin; 
+    scrollbar-color: var(--accent-color) var(--bg-dark);
+    padding: 10px 5px 20px 5px;
+    margin: 15px -20px -30px -20px;
+    background: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.2) 10%, rgba(0,0,0,0.2) 90%, transparent 100%);
+}
+.hourly-scroll-container::-webkit-scrollbar { height: 6px; }
+.hourly-scroll-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
+.hourly-scroll-container::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 3px; }
+.hourly-scroll-container::-webkit-scrollbar-thumb:hover { background: #3aa3ff; }
+.hourly-item { 
+    background: var(--card-bg); 
+    border-radius: 20px; 
+    padding: 15px 10px; 
+    min-width: 75px; 
+    text-align: center; 
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: transform 0.3s ease, background 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+.hourly-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+.hourly-item:hover {
+    transform: translateY(-5px);
+    background: rgba(79, 172, 254, 0.2);
+}
+.hourly-item:hover::before {
+    transform: scaleX(1);
+}
+.hourly-time { 
+    font-size: 0.85rem; 
+    color: var(--secondary-text); 
+    display: block; 
+    margin-bottom: 10px; 
+    transition: color 0.3s ease;
+}
+.hourly-item:hover .hourly-time {
+    color: white;
+}
+.hourly-icon { 
+    font-size: 1.5rem; 
+    margin-bottom: 10px; 
+    color: var(--accent-color); 
+    transition: transform 0.3s ease;
+}
+.hourly-item:hover .hourly-icon {
+    transform: scale(1.2);
+}
+.hourly-temp { 
+    font-weight: bold; 
+    font-size: 1.1rem; 
+    transition: color 0.3s ease;
+}
+.hourly-item:hover .hourly-temp {
+    color: white;
+}
 
 /* بخش پیش‌بینی گسترده */
 .more-forecast-section { margin-top: 20px; }
 
 /* کیفیت هوا */
-.air-quality-card, .chart-section { background: var(--card-bg); border-radius: 25px; padding: 20px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); }
+.air-quality-card, .chart-section { 
+    background: var(--card-bg); 
+    border-radius: 25px; 
+    padding: 20px; 
+    margin-bottom: 25px; 
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+.air-quality-card::before, .chart-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+.air-quality-card:hover, .chart-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+.air-quality-card:hover::before, .chart-section:hover::before {
+    transform: scaleX(1);
+}
 .aqi-content { display: flex; align-items: center; gap: 20px; }
 .aqi-indicator { width: 70px; height: 70px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; color: white; border: 4px solid rgba(255,255,255,0.2); }
 .aqi-details h4 { font-size: 1.1rem; margin-bottom: 5px; }
@@ -105,38 +254,204 @@ body { background: var(--bg-dark); color: var(--text-color); overflow-x: hidden;
 .chart-container { height: 180px; width: 100%; }
 
 /* جستجو */
-.search-box input { width: 100%; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); padding: 15px 20px; border-radius: 15px; color: white; font-size: 1rem; outline: none; transition: 0.3s; }
-.search-box input:focus { border-color: var(--accent-color); }
+.search-box input { 
+    width: 100%; 
+    background: var(--card-bg); 
+    border: 1px solid rgba(255,255,255,0.1); 
+    padding: 15px 20px; 
+    border-radius: 15px; 
+    color: white; 
+    font-size: 1rem; 
+    outline: none; 
+    transition: 0.3s; 
+    position: relative;
+    z-index: 1;
+}
+.search-box input:focus { 
+    border-color: var(--accent-color); 
+    box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.3);
+}
 .search-results { margin-top: 15px; }
-.search-item { padding: 15px; background: var(--card-bg); margin-bottom: 8px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-.search-item:active { background: var(--accent-color); }
+.search-item { 
+    padding: 15px; 
+    background: var(--card-bg); 
+    margin-bottom: 8px; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    transition: 0.3s; 
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent;
+}
+.search-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+.search-item:hover::before {
+    transform: translateX(100%);
+}
+.search-item:hover { 
+    background: rgba(79, 172, 254, 0.2);
+    border-color: rgba(79, 172, 254, 0.3);
+    transform: translateX(5px);
+}
+.search-item:active { 
+    background: var(--accent-color); 
+    transform: scale(0.98);
+}
 
 /* لیست هفتگی */
-.weekly-list { background: var(--card-bg); border-radius: 25px; padding: 10px 20px; }
-.weekly-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.weekly-item:last-child { border: none; }
-.weekly-day { width: 30%; font-weight: 500; }
-.weekly-icon { width: 20%; text-align: center; font-size: 1.2rem; color: var(--accent-color); }
-.weekly-temps { width: 50%; text-align: left; font-weight: bold; }
-.weekly-temps span { color: var(--secondary-text); font-weight: normal; margin-left: 10px; }
+.weekly-list { 
+    background: var(--card-bg); 
+    border-radius: 25px; 
+    padding: 10px 20px; 
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+}
+.weekly-item { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 15px 0; 
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.3s ease;
+    border-radius: 15px;
+    margin: 0 -15px;
+    padding: 15px 30px;
+}
+.weekly-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+.weekly-item:last-child { 
+    border: none; 
+}
+.weekly-day { 
+    width: 30%; 
+    font-weight: 500; 
+    transition: color 0.3s ease;
+}
+.weekly-item:hover .weekly-day {
+    color: var(--accent-color);
+}
+.weekly-icon { 
+    width: 20%; 
+    text-align: center; 
+    font-size: 1.2rem; 
+    color: var(--accent-color); 
+    transition: transform 0.3s ease;
+}
+.weekly-item:hover .weekly-icon {
+    transform: scale(1.2);
+}
+.weekly-temps { 
+    width: 50%; 
+    text-align: left; 
+    font-weight: bold; 
+    transition: color 0.3s ease;
+}
+.weekly-item:hover .weekly-temps {
+    color: white;
+}
+.weekly-temps span { 
+    color: var(--secondary-text); 
+    font-weight: normal; 
+    margin-left: 10px; 
+    transition: color 0.3s ease;
+}
+.weekly-item:hover .weekly-temps span {
+    color: var(--accent-color);
+}
 
 /* لیست پیش‌بینی گسترده */
-.extended-forecast-list { background: var(--card-bg); border-radius: 25px; padding: 10px 20px; }
+.extended-forecast-list { 
+    background: var(--card-bg); 
+    border-radius: 25px; 
+    padding: 10px 20px; 
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+}
 .extended-forecast-item { 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
     padding: 15px 0; 
-    border-bottom: 1px solid rgba(255,255,255,0.05); 
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.3s ease, transform 0.2s ease;
+    border-radius: 15px;
+    margin: 0 -15px;
+    padding: 15px 30px;
 }
-.extended-forecast-item:last-child { border: none; }
-.ext-day { width: 35%; font-weight: 500; font-size: 0.9rem; }
-.ext-icon { width: 15%; text-align: center; font-size: 1.2rem; color: var(--accent-color); }
-.ext-temps { width: 30%; text-align: left; font-weight: bold; }
-.ext-temps span { color: var(--secondary-text); font-weight: normal; margin-left: 10px; }
-.ext-precip { width: 20%; display: flex; align-items: center; justify-content: flex-end; gap: 5px; }
-.ext-precip i { font-size: 0.9rem; color: var(--accent-color); }
-.ext-precip span { font-weight: bold; font-size: 0.9rem; }
+.extended-forecast-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateX(5px);
+}
+.extended-forecast-item:last-child { 
+    border: none; 
+}
+.ext-day { 
+    width: 35%; 
+    font-weight: 500; 
+    font-size: 0.9rem; 
+    transition: color 0.3s ease;
+}
+.extended-forecast-item:hover .ext-day {
+    color: var(--accent-color);
+}
+.ext-icon { 
+    width: 15%; 
+    text-align: center; 
+    font-size: 1.2rem; 
+    color: var(--accent-color); 
+    transition: transform 0.3s ease;
+}
+.extended-forecast-item:hover .ext-icon {
+    transform: scale(1.2);
+}
+.ext-temps { 
+    width: 30%; 
+    text-align: left; 
+    font-weight: bold; 
+    transition: color 0.3s ease;
+}
+.extended-forecast-item:hover .ext-temps {
+    color: white;
+}
+.ext-temps span { 
+    color: var(--secondary-text); 
+    font-weight: normal; 
+    margin-left: 10px; 
+    transition: color 0.3s ease;
+}
+.extended-forecast-item:hover .ext-temps span {
+    color: var(--accent-color);
+}
+.ext-precip { 
+    width: 20%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: flex-end; 
+    gap: 5px; 
+    transition: color 0.3s ease;
+}
+.extended-forecast-item:hover .ext-precip {
+    color: var(--accent-color);
+}
+.ext-precip i { 
+    font-size: 0.9rem; 
+    color: var(--accent-color); 
+}
+.ext-precip span { 
+    font-weight: bold; 
+    font-size: 0.9rem; 
+}
 
 /* لودینگ */
 .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18,18,30,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; }

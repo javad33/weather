@@ -35,7 +35,10 @@ const weatherDetails = {
     visibility: { label: "دید", unit: "km", icon: "fa-eye" },
     uv_index: { label: "اشعه UV", unit: "", icon: "fa-sun" },
     dew_point: { label: "نقطه شبنم", unit: "°C", icon: "fa-droplet" },
-    cloud_cover: { label: "پوشش ابر", unit: "%", icon: "fa-cloud" }
+    cloud_cover: { label: "پوشش ابر", unit: "%", icon: "fa-cloud" },
+    precipitation: { label: "بارش", unit: "mm", icon: "fa-umbrella" },
+    sunrise: { label: "طلوع آفتاب", unit: "", icon: "fa-sun" },
+    sunset: { label: "غروب آفتاب", unit: "", icon: "fa-moon" }
 };
 
 // تابع دریافت آیکون و متن
@@ -182,6 +185,20 @@ function updateDetailedInfo(w, a) {
                         <p>${Math.round(current.dew_point_2m)}°</p>
                     </div>
                 </div>
+                <div class="detail-card">
+                    <i class="fa-solid fa-wind"></i>
+                    <div>
+                        <h4>سرعت باد</h4>
+                        <p>${current.wind_speed_10m} km/h</p>
+                    </div>
+                </div>
+                <div class="detail-card">
+                    <i class="fa-solid fa-compress-alt"></i>
+                    <div>
+                        <h4>رطوبت</h4>
+                        <p>${current.relative_humidity_2m}%</p>
+                    </div>
+                </div>
             </div>
         </div>
     `;
@@ -199,6 +216,8 @@ function updateDetailedInfo(w, a) {
     document.querySelector('.detail-card:nth-child(4) p').textContent = `${Math.round(current.uv_index)}`;
     document.querySelector('.detail-card:nth-child(5) p').textContent = `${current.precipitation} mm`;
     document.querySelector('.detail-card:nth-child(6) p').textContent = `${Math.round(current.dew_point_2m)}°`;
+    document.querySelector('.detail-card:nth-child(7) p').textContent = `${current.wind_speed_10m} km/h`;
+    document.querySelector('.detail-card:nth-child(8) p').textContent = `${current.relative_humidity_2m}%`;
 }
 
 // بروزرسانی صفحه 7 روزه
