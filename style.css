@@ -4,6 +4,10 @@
     --text-color: #ffffff;
     --accent-color: #4facfe;
     --secondary-text: rgba(255, 255, 255, 0.6);
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --danger-color: #f44336;
+    --info-color: #2196f3;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', Tahoma, sans-serif; }
@@ -38,6 +42,45 @@ body { background: var(--bg-dark); color: var(--text-color); overflow-x: hidden;
 .detail-item span { font-weight: bold; font-size: 1rem; }
 .detail-item small { font-size: 0.75rem; opacity: 0.7; }
 
+/* اطلاعات تفصیلی */
+.detailed-weather-info { margin-top: 20px; }
+.detail-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+    gap: 15px; 
+}
+.detail-card { 
+    background: var(--card-bg); 
+    border-radius: 20px; 
+    padding: 15px; 
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 8px;
+    transition: transform 0.3s ease;
+}
+.detail-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.12);
+}
+.detail-card i { 
+    font-size: 1.8rem; 
+    margin-bottom: 5px; 
+    color: var(--accent-color);
+}
+.detail-card h4 { 
+    font-size: 0.85rem; 
+    margin-bottom: 5px; 
+    color: var(--secondary-text);
+    font-weight: 500;
+}
+.detail-card p { 
+    font-size: 1.1rem; 
+    font-weight: bold; 
+    color: white;
+}
+
 /* تیتر بخش‌ها */
 .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .section-header h3 { font-size: 1.1rem; font-weight: 600; }
@@ -49,6 +92,9 @@ body { background: var(--bg-dark); color: var(--text-color); overflow-x: hidden;
 .hourly-time { font-size: 0.85rem; color: var(--secondary-text); display: block; margin-bottom: 10px; }
 .hourly-icon { font-size: 1.5rem; margin-bottom: 10px; color: var(--accent-color); }
 .hourly-temp { font-weight: bold; font-size: 1.1rem; }
+
+/* بخش پیش‌بینی گسترده */
+.more-forecast-section { margin-top: 20px; }
 
 /* کیفیت هوا */
 .air-quality-card, .chart-section { background: var(--card-bg); border-radius: 25px; padding: 20px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); }
@@ -73,6 +119,24 @@ body { background: var(--bg-dark); color: var(--text-color); overflow-x: hidden;
 .weekly-icon { width: 20%; text-align: center; font-size: 1.2rem; color: var(--accent-color); }
 .weekly-temps { width: 50%; text-align: left; font-weight: bold; }
 .weekly-temps span { color: var(--secondary-text); font-weight: normal; margin-left: 10px; }
+
+/* لیست پیش‌بینی گسترده */
+.extended-forecast-list { background: var(--card-bg); border-radius: 25px; padding: 10px 20px; }
+.extended-forecast-item { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 15px 0; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
+}
+.extended-forecast-item:last-child { border: none; }
+.ext-day { width: 35%; font-weight: 500; font-size: 0.9rem; }
+.ext-icon { width: 15%; text-align: center; font-size: 1.2rem; color: var(--accent-color); }
+.ext-temps { width: 30%; text-align: left; font-weight: bold; }
+.ext-temps span { color: var(--secondary-text); font-weight: normal; margin-left: 10px; }
+.ext-precip { width: 20%; display: flex; align-items: center; justify-content: flex-end; gap: 5px; }
+.ext-precip i { font-size: 0.9rem; color: var(--accent-color); }
+.ext-precip span { font-weight: bold; font-size: 0.9rem; }
 
 /* لودینگ */
 .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18,18,30,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; }
